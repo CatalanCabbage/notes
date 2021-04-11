@@ -1,1 +1,9 @@
-
+backend
+TLDR
+UI
+backend
+onPremise
+Eg
+NGINX
+xJS
+balancers

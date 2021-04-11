@@ -9,9 +9,9 @@ An application might have various _Tiers_.
 ### Single Tier:
 <img src="https://user-images.githubusercontent.com/45961072/114297126-83318a80-9acc-11eb-9f85-dbe81ba6bf3a.png" height="399px" width="624px"></img>
 
-All components reside on the same machine (basically onPremise products).  
-Eg: PC Games, LibreOffice suite.  
-The User interface, Database and backend all reside on the same machine.  
+|What?|TLDR|Examples|
+|:---:|:---:|:---:|
+|Basically onPremise products.|UI, backend, DB - all components on the same machine.|PC Games, LibreOffice suite|
 
 **Advantages**
 - No network latency
@@ -26,9 +26,10 @@ The User interface, Database and backend all reside on the same machine.
 ### Two Tier:
 <img src="https://user-images.githubusercontent.com/45961072/114297187-ce4b9d80-9acc-11eb-8ad3-2526f8c99a03.JPG" height="399px" width="624px"></img>
 
-Client and server(~DB).  
-Client has UI and business logic and is in one machine; the server has the DB alone, on another machine.
-Eg: Mobile games, To-do lists.
+
+|What?|TLDR|Examples|
+|:---:|:---:|:---:|
+|Client - DB Server model|2 machines: Client (UI + Business logic), Server (DB)|Heavy mobile games, to-do lists|
 
 **Disadvantages**: Same as previous.
 
@@ -44,7 +45,12 @@ Eg., in games:
 ### Three Tier:
 <img src="https://user-images.githubusercontent.com/45961072/114297209-f2a77a00-9acc-11eb-8dea-42c9084ca9d0.png" height="399px" width="624px"></img>
 
-Client, backend server and DB on separate machines.  
+
+|What?|TLDR|Examples|
+|:---:|:---:|:---:|
+|Client - Server - DB model|Client, backend server and DB on separate machines.|Blogs, websites|
+
+  
 Something like HTML-CSS-xJS + Apache/NGINX + PostgreSQL.  
 Most popular, suits many basic applications; business can control the logic and data.
 

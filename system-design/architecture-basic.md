@@ -31,6 +31,7 @@ So why is this needed?
 - Keeps latency low since business logic and UI are in the same machine
 - Network call to server (DB) only when data needs to be persisted
 - Economical (fewer calls)
+
 Eg., in games: 
 - Low latency: The files are downloaded onto the client. 
 - Fewer server calls: Calls are made only to keep the game state persistent.

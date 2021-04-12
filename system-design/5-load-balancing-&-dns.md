@@ -51,3 +51,4 @@ Most of this DNS information is cached based on a TTL, usually a few hours.
 - Hence, the Authoritative Nameserver returns a *list of IP addresses* instead of a single address.  
 - With every request, the authoritative server changes the order of the IP addresses in the list in a round-robin fashion.  
 - The client forwards requests to the first address on the list.
+- If the first address does not return data within the TTL, it can make requests to the next address.

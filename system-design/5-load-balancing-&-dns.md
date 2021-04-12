@@ -12,6 +12,23 @@ They can be used to manage traffic directed towards any component.
 > In-service instances: Instances (like servers) that are up and running in the cluster  
 > Out-of-service instances: Instances that are down
 
+## Load Balancing methods
+- DNS Load Balancing
+- Hardware-based Load Balancing 
+  - Network switches and routers - Cisco Catalyst, Barracuda load balancer
+- Software-based Load Balancing
+  - Work on scheduling algorithms - HAProxy, NGINX
+
+## Algorithms used in Load Balancing
+- Round Robin/Weighted Round Robin: Routed sequentially to servers.
+- Least connections: Routed to servers with the least open connections.
+- Random
+- Hash: Routes to a specific server based on source IP Hash.
+  - A client will always connect to the same server.
+  - Can provided efficient ways to implement caching.
+
+---
+
 # DNS
 Every machine that's online has a unique IP address (2001:db8:0:1194:0:567:8:1).  
 DNS maps IP addresses to Domain names (www.example.com).

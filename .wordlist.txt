@@ -1,5 +1,15 @@
 backend
 TLDR
+TLD
+Nameserver
+DNS
+www
+HAProxy
+balancer
+Microservice
+codebases
+codebase
+heterogenous
 UI
 backend
 onPremise

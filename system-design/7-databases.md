@@ -64,8 +64,11 @@ SQL with no relationships and joins == NoSQL.
 
 [Why Quora uses SQL and not NoSQL](https://www.quora.com/Why-does-Quora-use-MySQL-as-the-data-store-instead-of-NoSQLs-such-as-Cassandra-MongoDB-or-CouchDB-Are-they-doing-any-JOINs-over-MySQL-Are-there-plans-to-switch-to-another-DB)
 
+---
+
 ## Polyglot Persistence
 Using several different persistence technologies to fulfil different persistence requirements in an application.  
+However, integration of all data stores increases complexity.  
 
 Eg: An FB-esque application:
 |Feature|DB|Example|
@@ -75,3 +78,30 @@ Eg: An FB-esque application:
 |Run analytics|Wide Column DB|Cassandra, HBase|
 |Recommendations|Graph DB|Neo4j|
 |Search|Document-oriented data store|Elasticsearch|
+
+<img src="https://user-images.githubusercontent.com/45961072/115062149-a5316f80-9f07-11eb-8ae8-1a577691b1c2.png" height="399px" width="624px"></img>
+
+### Multi-model DBs
+DB capable of using different data models in a single database system.  
+Reduce complexity, since all types are persistence are exposed via a single API.  
+Eg. ArangoDB, CosmosDB, OrientDB, CouchBase
+
+## Consistency
+### Eventual consistency
+All server nodes are updated at different speeds, so they might not be strictly consistent at a particular instance.
+A consistency model which enables the data store to be highly available.  
+Also known as optimistic replication, key to distributed systems.
+
+Eg. Say there's a blog; it has replicated datastores throughout the world.  
+Since there are so many nodes running, there is no single point of failure.  
+The data store service is highly available. Even if a few nodes go down the persistence service as a whole is still up.  
+When an action is performed in one node, it takes time to be replicated across all instances (become consistent).  
+
+Advantages:  
+- New nodes can be added on the fly
+- Suitable for applications that don't need exact values immediately (like likes on a post)
+- Allows the system flexibility, so it can be highly available
+
+## Strong consistency
+All the server nodes across the world should contain the same value of an entity at any point in time. 
+

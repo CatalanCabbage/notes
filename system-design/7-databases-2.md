@@ -1,13 +1,12 @@
-# Databases - 2
+# Databases
 
 ## Types of Databases
 - Relational database
 - Document-Oriented database
 - Graph database
 - Key-value database
-- Wide-column database
-- Relational database
 - Time-Series database
+- Wide-column database
 - Databases dedicated to mobile apps
 
 ### Document-Oriented database  
@@ -68,3 +67,29 @@ Use-cases:
 - Implementing queues
 - Creating leaderboards in online games & web apps
 - Implementing a pub-sub system
+
+### Time-series database
+
+> Time Series Data: Data containing data points associated with the occurrence of an event with respect to time.
+
+Optimized for tracking & persisting time series data.  
+Time-Series data is tracked, monitored and then finally aggregated based on certain business logic.  
+Useful for applications that deal with data that streams in real time, like running analytics.
+
+Eg. Influx DB, Timescale DB, Prometheus
+
+
+Use-cases: 
+- IoT devices 
+- Self-driving vehicles
+- Industry sensors
+- Social networks
+- Stock market financial data
+- Analytics
+
+Used by [Spiio](https://www.influxdata.com/customer/customer-case-study-spiio/) - an IoT sensor solutions org and [IBM](https://www.influxdata.com/customer/oracle/) for monitoring.
+
+### Wide-column database
+The Wide-column database uses typical tables, columns, and rows.  
+But unlike relational databases, columnar formatting and names can vary from row to row inside the same table.  
+Each column is stored as a separate file on disk.  

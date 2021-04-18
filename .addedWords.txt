@@ -1,0 +1,4 @@
+masterless
+scalable
+CP
+resync

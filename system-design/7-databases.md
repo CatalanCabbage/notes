@@ -108,7 +108,7 @@ Use-cases:
 
 ### Strong consistency
 All the server nodes across the world should contain the same value of an entity at any point in time.  
-Generally done by locking the elements being changed, preventing concurrent modification and lifting locks only after changes are propogated.  
+Generally done by locking the elements being changed, preventing concurrent modification and lifting locks only after changes are propagated.  
 Impacts HA and scalability, since time spent waiting for locks to be lifted is time wasted.  
 ACID compliant transactions.  
 

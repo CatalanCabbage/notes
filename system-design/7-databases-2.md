@@ -7,6 +7,7 @@
 - Key-value database
 - Time-Series database
 - Wide-column database
+- Columnar database
 - Databases dedicated to mobile apps
 
 ### Document-Oriented database  
@@ -92,4 +93,42 @@ Used by [Spiio](https://www.influxdata.com/customer/customer-case-study-spiio/) 
 ### Wide-column database
 The Wide-column database uses typical tables, columns, and rows.  
 But unlike relational databases, columnar formatting and names can vary from row to row inside the same table.  
-Each column is stored as a separate file on disk.  
+Each column can hold multiple key-value pairs, enabling it to add any new keys on the fly.  
+Built for quick writes. Ref. [Cassandra perf](https://www.scnsoft.com/blog/cassandra-performance)  
+
+Eg.  Cassandra, HBase, Google BigTable, Scylla DB
+
+Use-case:  
+Say the medical history of patients is to be stored; it varies widely for each person.  
+Eg. 
+Relational DB:  
+|Patient|has had fever?|had polio shots at|took x meds at|has headache|lactose intolerant|regularly takes vitamins|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|A|yes|3|12th Jan, 2021|null|null|null| 
+|B|null|null|null|no|yes|yes| 
+
+Wide-column DB:
+|Patient|History|
+|:---:|:---:|
+|A| "has had fever? : yes", "had polio shots at : 3", "took x meds at: 12th Jan, 2021"|  
+|B| "has headache? : no", "lactose intolerant? : yes", "regularly takes vitamins : yes"|
+
+If we used a relational DB here, Patient A and B would both need to have 6 columns and unused columns will be `null`.  
+But if wide-column database is used, they can store their corresponding key-values in their rows, and they don't need to overlap.  
+
+[Good reference - SO](https://stackoverflow.com/a/62027444/12415069)
+
+### Columnar database
+A columnar (column-oriented) database stores data tables by column rather than by row.  
+- Low IO requirements: When all values in a column are needed: reduces the overall disk I/O requirements and reduces the amount of data you need to load from disk, since they're stored close together.  
+- Easy compression: Since column values are stored together, their data-type is the same and they can be compressed easily.  
+
+Use-case: Typically for analytical operations.
+
+Eg. Say a row has 100 columns. You run a query involving 5 columns.  
+In RDBs, all rows are fetched and then columns are filtered - 100% data is read.  
+In wide-column DB, only those 5 columns are read; and since they're close to each other wrt storage blocks, no filtering is needed; only 5% of data is read.   
+
+Eg. PostgreSQL c-store, InfiniDB, Amazon Redshift, Microsoft Azure SQL Data Warehouse, Google BigQuery
+
+[Good reference: Amazon Redshift](https://docs.aws.amazon.com/redshift/latest/dg/c_columnar_storage_disk_mem_mgmnt.html)

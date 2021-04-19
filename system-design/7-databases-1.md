@@ -6,6 +6,8 @@ Classification of data:
 - **Unstructured data**: No definite structure. Heterogeneous; contains streams, text, blobs, media, etc. Needs preparation.
 - **Semi-structured data**: Mix of structured and unstructured data. Usually stored in XML, JSON, etc.
 
+> Throughput: Actions (like Transactions) per second
+
 ## Relational (SQL) Databases
 Modelled based on the normalized relationship between data. ACID compliant.  
 Eg. PostgreSQL, MySQL, Amazon Aurora, MariaDB, Google Cloud SQL, MSSQL

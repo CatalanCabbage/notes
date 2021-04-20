@@ -6,6 +6,10 @@ Features:
 - Facilitate asynchronous behaviour: Modules can communicate in the background without blocking primary tasks.
 - Facilitate cross-module communication: Allows communication in a heterogeneous environment, and also provide temporary storage until messages are processed.
 
+Eg. RabbitMQ, Apache ActiveMQ, Apache Kafka, Azure Event Hubs, AWS SNSS
+
+Protocols: Advanced Message Queuing Protocol (AMQP), Streaming Text Oriented Messaging Protocol (STOMP)
+
 ## Publish-Subscribe (Pub-Sub) Model
 A method of message transfer where the publisher doesn’t need to know who uses the broadcasted information, and the subscribers don’t need to know who the message comes from.  
 
@@ -73,3 +77,9 @@ Basically direct exchange, but logic can be specified (must match all headers, o
 
 <img src="https://user-images.githubusercontent.com/45961072/115385537-df478d80-a1f5-11eb-9c70-e3513fd1ba61.png" height="350px" width="300px"></img>  
 
+## Point to Point Model
+Message from a producer is consumed only by message receiver (which may be streamed to more than one consumer)  
+
+Two variants:
+- Fire and forget: Just sends the message, does not care about if it was received or not
+- The request/reply model: Sends the message and waits for the response.

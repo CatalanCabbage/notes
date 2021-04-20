@@ -7,6 +7,7 @@ A cache's primary purpose is to increase data retrieval performance by reducing 
 Caching can be implemented at any layer: Browser cache, [HTTP caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching), Database caching, DNS caching, etc  
 
 > Cache Invalidation: The process where data is purged from the cache and is replaced by newly updated data after the TTL of the old data is reached.  
+> Usually handled by TTLs.  
 
 Cache Hit: Data requested by the client is present in the cache, and is served.  
 Cache Miss: Data requested by the client is not in the cache, and needs to hit the DB to be served.  
@@ -70,8 +71,6 @@ Needs to handle complex cases, such as transaction failures/out of order updates
 - This method implies that the database transactions must never fail; if this cannot be guaranteed, then rollbacks must be accommodated.  
 - This may re-order database updates, and so referential integrity constraints (FK relations) must allow out-of-order updates.
 
-Further read: [Oracle: Selecting a caching strategy](https://docs.oracle.com/cd/E15357_01/coh.360/e15723/cache_rtwtwbra.htm#COHDG200)
-
 ---
 
-## Cache Invalidation
+Further read: [Oracle: Selecting a caching strategy](https://docs.oracle.com/cd/E15357_01/coh.360/e15723/cache_rtwtwbra.htm#COHDG200)

@@ -19,4 +19,19 @@ There are several layers to the data processing setup:
 - Data storage layer: Persists data
 - Data security layer: Has security systems in place for UAC, etc.
 
- 
+ Ways to ingest data:
+ - Real-time: For medical data like heartbeat, BP or financial applications
+ - Batched: Analytics, generalized data
+
+Challenges:
+- Slow process: Conversion is a challenge since data is heterogeneous; takes a lot of computing resources and time.
+- Complex and Expensive: Preparation of data is expensive; formats of data might differ at any time too.
+- Security: Moving data around is inherently risky, and this process has several staging areas.
+
+Use-cases:
+- Moving big data into Hadoop: Hadoop is the most popular distributed data processing framework for analysis.
+- Streaming data from DBs to ElasticSearch: Sometimes whole DBs are replicated into ElasticSearch for indexing.
+- Log processing: Log processing from distributed systems is a challenge, usually the ELK (Elastic LogStash Kibana) stack 
+- Engines for real-time events: Live Sports
+
+Eg. Apache Storm, Apache Nifi, Apache Spark, Samza, Flink

@@ -93,3 +93,9 @@ Preferred for real-time streaming.
 An open-source distributed stream processing & messaging platform developed by LinkedIn.  
 Used in the industry to develop real-time features such as notification platforms, managing streams of massive amounts of data, monitoring website activity & metrics, messaging, log aggregation.  
 
+### Popular Architectures
+- Lambda architecture
+- Kappa architecture
+
+#### Lambda Architecture
+#### Kappa Architecture

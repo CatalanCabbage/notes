@@ -24,7 +24,7 @@ There are several layers to the data processing setup:
  ### Ways to ingest data
  - Real-time: For medical data like heartbeat, BP or financial applications
  - Batched: For analytics or generalized data.  
-   ETL (Extract-Transform-Load) is generally used.  
+   **ETL** (Extract-Transform-Load) is generally used.  
    - Extract: Fetching data from multiple data sources 
    - Transform: Transforming the extracted heterogeneous data into a standardized format
    - Load: Moving the transformed data to a another location for further processing
@@ -43,12 +43,14 @@ There are several layers to the data processing setup:
 ## Data Pipelines
 Data pipelines facilitate the efficient flow of data from one point to another, and also enable the developers to apply filters on the data streaming-in in real-time.  
 
-Features:
+**Features**:
 - Ensures smooth flow of data.
 - Enables application of filters and business logic on streaming data.
 - Averts any bottlenecks and redundancy in the data flow.
 - Facilitates parallel processing of data.
 - Avoids data being corrupted.
+
+---
 
 ## Distributed Data-Processing
 Distributed data processing means diverging large amounts of data to several different nodes, running in a cluster, for parallel processing.  
@@ -56,7 +58,38 @@ All the nodes execute the task allotted parallelly, working in conjunction with 
 <img src="https://user-images.githubusercontent.com/45961072/116463142-f8041300-a887-11eb-8230-01a4faec44a2.png" height="350px" width="624px"></img>
 
 
-Advantages:
+**Advantages**:
 - Scalable and highly available: Nodes are distributed and the tasks are executed parallelly
 - Loss of data can be prevented by replicating data across nodes
+
+### Popular Technologies
+#### Apache Hadoop (MapReduce implementation)
+Preferred for batch processing.  
+The most poular implementation of the MapReduce model.  
+MapReduce is programming model written for managing distributed data processing across several different machines in a cluster - distributing tasks, running work in parallel, managing all the communication and data transfer.  
+
+**Map**: Sorting the data based on a parameter  
+**Reduce**: Summarizing the sorted data
+
+The base Apache Hadoop framework is composed of the following modules
+- **Hadoop Common**: Contains libraries and utilities needed by other Hadoop modules
+- **Hadoop Distributed File System (HDFS)**: A distributed file-system that stores data on commodity machines, providing very high aggregate bandwidth across the cluster
+- **Hadoop YARN**: A platform responsible for managing computing resources in clusters and using them for scheduling users' applications
+- **Hadoop MapReduce**: An implementation of the MapReduce programming model for large-scale data processing
+- **Hadoop Ozone**: An object store for Hadoop
+
+#### Apache Spark
+Preferred for real-time streaming.  
+A unified analytics engine for large-scale data processing - basically an open-source cluster computing framework that provides high performance for both batch and real-time in-stream processing.  
+It can work with diverse data sources and facilitates parallel execution of work in a cluster.  
+
+#### Apache Storm
+Preferred for real-time streaming.  
+A computation system that reliably processes unbounded streams of data, doing for real-time processing what Hadoop did for batch processing.  
+Was open sourced after being acquired by Twitter.  
+
+#### Apache Kafka
+Preferred for real-time streaming.  
+An open-source distributed stream processing & messaging platform developed by LinkedIn.  
+Used in the industry to develop real-time features such as notification platforms, managing streams of massive amounts of data, monitoring website activity & metrics, messaging, log aggregation.  
 

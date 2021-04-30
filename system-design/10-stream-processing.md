@@ -27,7 +27,9 @@ There are several layers to the data processing setup:
    **ETL** (Extract-Transform-Load) is generally used.  
    - Extract: Fetching data from multiple data sources 
    - Transform: Transforming the extracted heterogeneous data into a standardized format
-   - Load: Moving the transformed data to a another location for further processing
+   - Load: Moving the transformed data to a another location for further processing  
+
+Real-time processing gives quick insights, and batched processing gives results that are more accurate and comprehensive.  
 
 ### Challenges
 - Slow process: Conversion is a challenge since data is heterogeneous; takes a lot of computing resources and time.
@@ -98,4 +100,23 @@ Used in the industry to develop real-time features such as notification platform
 - Kappa architecture
 
 #### Lambda Architecture
+A distributed data processing architecture that **leverages both batch and the real-time streaming data processing approaches** to tackle the latency issues arising out of the batch processing approach.  
+It joins results from both the approaches before presenting it to the end user.  
+
+It generally has 3 layers:  
+- Batch Layer: Deals with results of batch processing
+- Speed Layer: Deals with results of real-time processing
+- Serving layer: Combines results of batch and speed processing layers
+
+<img src="https://user-images.githubusercontent.com/45961072/116713408-649b2100-a9f2-11eb-9027-07bdf646c851.png" height="350px" width="615px"></img>
+
 #### Kappa Architecture
+A distributed data processing architecture where all data (batched and real-time) flows through a single data streaming pipeline.  
+Reduces the complexity of not having to manage separate layers for processing data.  
+Use-case: Where the batch and the streaming analytics results are fairly identical.  
+
+Has only 2 layers:  
+- Speed layer: Streaming processing layer
+- Serving layer: Delivers information and results
+
+<img src="https://user-images.githubusercontent.com/45961072/116717937-13d9f700-a9f7-11eb-9209-d3603b9ee39b.png" height="300px" width="615px"></img>

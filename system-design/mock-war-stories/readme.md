@@ -1,6 +1,7 @@
 # Mock war stories
 A mock-up of how different services could be designed.  
 
+General pointers while designing a service:
     Step 1: Requirements clarifications
     Step 2: Back-of-the-envelope estimation
     Step 3: System interface definition

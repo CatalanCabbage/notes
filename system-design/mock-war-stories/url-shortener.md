@@ -31,14 +31,43 @@ URL reads/s = 200 * 100 = 20k reads/s //100:1 read-write ratio
 
 ### Storage
 Assume:  
-- 500 shortenings/month
-- Each URL is stored for 5 years
-- Each URL object is 500 bytes (including related metadata)
+- 500 shortenings/month  
+- Each URL is stored for 5 years  
+- Each URL object is 500 bytes (including related metadata)  
 
 So,  
 Total objects = 500 * 12 months * 5 years = 30B  
-Total storage = 300B * 500 bytes = 15 TB
+Total storage = 300B * 500 bytes = 15 TB  
 
 ### Bandwidth
-For write requests: 200 URLs/s * 500 bytes = 100 KB/s
+For write requests: 200 URLs/s * 500 bytes = 100 KB/s  
 For read requests: 20k URLs/s * 500 bytes = 10 MB/s
+
+### Memory
+Requests/day = 20K URLs/s * 3600 seconds * 24 hours = 1.7B  
+Assume only 20% is cached; so memory needed for that is (0.2 * 1.7B * 500 bytes) = 170GB  
+
+**Summary:**  
+Assuming 500M URLs/month and 100:1 read-write ratio:  
+|Parameter|Value|
+|:---:|:---:|
+|New URLs|200/s|
+|URL redirections|20k/s|
+|Incoming data (bandwidth)|100 KB/s|
+|Outgoing data (bandwidth)|10 MB/s|
+|Storage for 5 years|15 TB|
+|Cache memory|170 GB|
+
+## System APIs
+### Create API
+```
+POST createURL
+Mandatory params:
+url
+
+api_dev_key //Needs to sign up to create a large number of URLs
+short_url
+expiry_date
+```
+
+### Delete API

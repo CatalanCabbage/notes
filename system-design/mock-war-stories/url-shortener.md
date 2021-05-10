@@ -20,7 +20,25 @@ Refer: [TinyURL](https://tinyurl.com/app), [Bit.ly](https://bit.ly/)
 - Should have exposed REST APIs
 
 ## Capacity estimation
+### Traffic
+Assume:  
+- 500M shortenings/month
+- 100:1 read-write ratio
 
+So,  
+URL writes/s = 500M / (30 days * 24 hours * 3600 seconds) = 200 writes/s  
+URL reads/s = 200 * 100 = 20k reads/s //100:1 read-write ratio
 
+### Storage
+Assume:  
+- 500 shortenings/month
+- Each URL is stored for 5 years
+- Each URL object is 500 bytes (including related metadata)
 
+So,  
+Total objects = 500 * 12 months * 5 years = 30B  
+Total storage = 300B * 500 bytes = 15 TB
 
+### Bandwidth
+For write requests: 200 URLs/s * 500 bytes = 100 KB/s
+For read requests: 20k URLs/s * 500 bytes = 10 MB/s

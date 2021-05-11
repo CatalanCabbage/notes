@@ -62,12 +62,47 @@ Assuming 500M URLs/month and 100:1 read-write ratio:
 ### Create API
 ```
 POST createURL
-Mandatory params:
-url
 
-api_dev_key //Needs to sign up to create a large number of URLs
-short_url
-expiry_date
+Params:
+url
+api_dev_key //Optional, needs to sign up to create a large number of URLs
+short_url //Optional
+expiry_date //Optional
 ```
 
 ### Delete API
+```
+DELETE deleteURL
+
+Params:
+api_dev_key
+short_url
+```
+
+## Database design
+Observations:
+- Billions of objects
+- Each object is < 1 KB
+- No relationships between objects
+- Read-heavy
+
+Each object has 2 parts - URL details, User details.  
+Let tables be:  
+**URL**
+|Field|Datatype|
+|:---:|:---:|
+|hash _(PK)_|varChar(16)|
+|url|varChar(512)|
+|creation_date|datetime|
+|expiry_date|datetime|
+|user_id|int|
+
+**User**
+|Field|Datatype|
+|:---:|:---:|
+|name|varChar(20)|
+|email_id|varChar(32)|
+|creation_date|datetime|
+|last_login|datetime|
+
+A NoSQL DB is more suitable in this case due to the absence of relationships.

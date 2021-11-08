@@ -22,3 +22,8 @@ Mock up of how services could be designed
 |Title|Content|
 |:---:|:---:|
 |[URL shortener](system-design/mock-war-stories/url-shortener.md)|Services like TinyURL or bit.ly|
+
+# Miscellaneous
+|Title|Content|
+|:---:|:---:|
+|[OSI model](misc/osi-model.md)|Model that standardizes communications|

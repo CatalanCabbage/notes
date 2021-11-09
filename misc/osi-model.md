@@ -64,6 +64,6 @@ Includes the physical equipment involved in the data transfer, such as the cable
 The physical layer of both devices must also agree on a signal convention so that the 1s can be distinguished from the 0s on both devices.
 
 ## References
-[Cloudflare docs](https://www.cloudflare.com/en-in/learning/ddos/glossary/open-systems-interconnection-model-osi/)
-[Wikipedia](https://en.wikipedia.org/wiki/OSI_model)
-[FreeCodeCamp](https://www.freecodecamp.org/news/osi-model-computer-networking-for-beginners/)
+[Cloudflare docs](https://www.cloudflare.com/en-in/learning/ddos/glossary/open-systems-interconnection-model-osi/)  
+[Wikipedia](https://en.wikipedia.org/wiki/OSI_model)  
+[FreeCodeCamp](https://www.freecodecamp.org/news/osi-model-computer-networking-for-beginners/)  

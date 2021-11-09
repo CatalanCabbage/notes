@@ -27,3 +27,4 @@ Mock up of how services could be designed
 |Title|Content|
 |:---:|:---:|
 |[OSI model](misc/osi-model.md)|Model that standardizes communications|
+|[Bash commands](misc/bash-commands.md)|Bash commands to achieve haccs|

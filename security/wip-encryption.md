@@ -132,6 +132,13 @@ Try it online - [Online hash generator](https://dencode.com/hash)
 Any file or document can be hashed; to ensure that a file has not been tampered with, we can compute the hash of the original and the file we have and check that it matches. Even if a single change is made to the file, the hash would be different.   
 - Password storage.
 
+# How do they all fit together?
+Most applications have login mechanisms - getting credentials (username and password) from the user to authenticate them.  
+When the username and password are sent from the client to the server, the data is **encoded** so that special characters don't cause any issues during transfer.  
+In order to provide encryption in transit and prevent eavesdroppers from getting the data during transit, HTTPS is used, which **encrypts** the data to send it securely.
+Once it reaches the server, the password is **hashed** and then stored in the DB. The next time the user tries to log in, the hash of the incoming password is compared with the hash in the DB; if they both match, the user is authenticated.  
+This ensures that the plaintext password isn't stored anywhere in the DB, ensuring that even if the DB is breached, plaintext user passwords are not compromised.  
+All these operations are performed by software; to deter malicious actors and to make this exact flow harder to decipher, the software's code is **obfuscated**.
 
 # References
 [The SSL Store - Symmetric vs Asymmetric encryption](https://www.thesslstore.com/blog/difference-asymmetric-encryption-algorithms-vs-symmetric-encryption-algorithms/)

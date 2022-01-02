@@ -150,8 +150,8 @@ This ensures that the plaintext password isn't stored anywhere in the DB, ensuri
 - **Obfuscation:** All these operations are performed by software; to deter malicious actors and to make this exact flow harder to decipher, the software's code is **obfuscated**.
 
 # References
-[The SSL Store - Symmetric vs Asymmetric encryption](https://www.thesslstore.com/blog/difference-asymmetric-encryption-algorithms-vs-symmetric-encryption-algorithms/)
-[Phemex - What is symmetric encryption?](https://phemex.com/academy/what-is-symmetric-key-encryption)
-[ctf101 - What are block ciphers?](https://ctf101.org/cryptography/what-are-block-ciphers/)
-[Wiki - Obfuscation](https://en.wikipedia.org/wiki/Obfuscation_(software))
-[FreeCodeCamp - What is Hashing?](https://www.freecodecamp.org/news/what-is-hashing/)
+[The SSL Store - Symmetric vs Asymmetric encryption](https://www.thesslstore.com/blog/difference-asymmetric-encryption-algorithms-vs-symmetric-encryption-algorithms/)  
+[Phemex - What is symmetric encryption?](https://phemex.com/academy/what-is-symmetric-key-encryption)  
+[ctf101 - What are block ciphers?](https://ctf101.org/cryptography/what-are-block-ciphers/)  
+[Wiki - Obfuscation](https://en.wikipedia.org/wiki/Obfuscation_(software))  
+[FreeCodeCamp - What is Hashing?](https://www.freecodecamp.org/news/what-is-hashing/)  

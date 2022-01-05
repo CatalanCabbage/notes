@@ -123,3 +123,73 @@ public interface Consumer<T> {
     }
 }
 ```
+
+## Lambda Functions
+This is an attempt to introduce functional programming in Java. In functional programming, functions can be passed as parameters; traditionally, functions have existed only within the scope of objects.  
+A lambda expression is an anonymous function - ie., it doesn't have an identifier.  
+
+### Building a Lambda function
+Consider a `PriorityQueue` which is a min-heap by default, and needs to be changed into a max-heap:  
+```java
+public class Main
+{
+    public static void main(String[] args) {
+        PriorityQueue<Integer> nums = new PriorityQueue<>(new CustomComparator());
+    }
+}
+
+//Reverse the order of comparison from a, b to b, a
+class CustomComparator implements Comparator<Integer> {
+    @Override
+    public int compare(Integer a, Integer b) {
+        return Integer.compare(b, a);
+    }
+}
+```
+
+Can be simplified into:
+```java
+public class Main
+{
+    public static void main(String[] args) {
+        PriorityQueue<Integer> nums = new PriorityQueue<>(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer a, Integer b) {
+                return Integer.compare(b, a);
+            }
+        });
+    }
+}
+```
+
+We don't need to specifically mention `new Comparator`; it will be handled by the compiler.
+```java
+    PriorityQueue<Integer> nums = new PriorityQueue<>(
+        public int compare(Integer a, Integer b) {
+            return Integer.compare(b, a);
+        }
+    );
+```
+
+We know that the `Comparator` interface has only one method, and so don't need to provide the method name either.
+```java
+    PriorityQueue<Integer> nums = new PriorityQueue<>(
+        public int (Integer a, Integer b) {
+            return Integer.compare(b, a);
+        }
+    );
+```
+
+The only method in the interface takes 2 `int` parameters and returns and `int`; so mentioning it again is redundant.  
+```java
+    PriorityQueue<Integer> nums = new PriorityQueue<>(
+        (a, b) -> {
+            Integer.compare(b, a);
+        }
+    );
+```
+
+Now since there's only one line in the body, `{}` is also unnecessary:  
+```java
+    PriorityQueue<Integer> nums = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
+```

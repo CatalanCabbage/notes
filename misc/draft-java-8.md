@@ -1,5 +1,5 @@
 # Java 8
-## Interfaces
+## Interfaces part 1
 
 ### Default methods
 **Before Java 8:** Interfaces can have only abstract methods.
@@ -192,4 +192,83 @@ The only method in the interface takes 2 `int` parameters and returns and `int`;
 Now since there's only one line in the body, `{}` is also unnecessary:  
 ```java
     PriorityQueue<Integer> nums = new PriorityQueue<>((a, b) -> Integer.compare(b, a));
+```
+
+## Streams API
+[Streams JavaDoc](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html)  
+A stream is a sequence of objects that supports various methods which can be pipelined to produce the desired result.  
+- A Stream isn't a data structure, but takes inputs from collections, arrays or I/O channels.
+- Streams don’t change the original data structure.
+- Streams are lazy. Computation on the source data is only performed when the terminal operation is initiated, and source elements are consumed only as needed.
+- Terminal operations mark the end of the stream and return the result.
+
+**Collections vs streams**: Collections and streams, while bearing some superficial similarities, have different goals.  
+Collections are primarily concerned with the efficient management of, and access to, their elements. By contrast, streams do not provide a means to directly access or manipulate their elements and are instead concerned with declaratively describing their source and the computational operations which will be performed in aggregate on that source.
+
+### Creating Streams
+```java
+Stream<String> stream;
+
+//Empty stream
+stream = Stream.empty();
+
+//Directly
+stream = Stream.of("Nile");
+stream = Stream.of("Nile", "Amazon", "Beas");
+
+//Builder pattern
+stream = Stream.<String>builder()
+        .add("Nile")
+        .add("Amazon")
+        .add("Indus")
+        .build();
+
+//From arrays
+String[] rivers = new String[]{"Nile", "Satluj"};
+stream = Stream.of(rivers);
+stream = Arrays.stream(rivers);
+
+//From collections
+List<String> list = Arrays.asList(rivers);
+stream = list.stream();
+
+//Generate an infinite sequential unordered stream
+stream = Stream.generate(() -> UUID.randomUUID()); //stream of random UUIDs
+stream = Stream.generate(UUID::randomUUID); //stream of random UUIDs, same as above
+stream = Stream.generate(() -> 0); //stream of 0s
+//For practical purposes, a limit needs to be specified.
+stream = Stream.generate(() -> 0).limit(10); //stream of 10 0s
+
+//Generate an infinite sequential ordered stream
+//First param is the seed value, second param is the function. So stream is: seed, f(seed), f(f(seed)), ...
+//Equivalent to an infinite for loop: for (int i = 1; ; i++)
+stream = Stream.iterate(1, i -> i + 1); //1, 2, 3, ...
+stream = Stream.iterate(1, i -> i * 2).limit(10); //Limit needs to be used
+
+
+//Generate a finite sequential ordered stream
+//Equivalent to a for loop: for (int i = 1; i < 10; i++)
+stream = Stream.iterate(0, i -> i < 10, i -> i + 1);
+```
+
+### Stream operations
+Types of operations:  
+- **Intermediate:** Do not produce results, but manipulate and return a stream, like `filter()`  
+- **Terminal:** Produce a result, like `collect()`
+
+
+
+## Interfaces part 2
+### Predicate functional interface
+A predicate is a function that evaluates the given input and returns `true` or `false`.  
+This interface has one abstract method `boolean test(T t)` and other default methods such as `and(Predicate<? super T> x)`, `or(Predicate<? super T> x)`, `isEqual(Object x)`, and `negate()`.  
+[Predicate JavaDocs](https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html)  
+
+Example:  
+```java
+Predicate<Integer> isMajorPredicate = age -> age > 18;
+Predicate<Integer> isSeniorCitizenPredicate = age -> age < 60;
+
+boolean isEligibleToVote = isMajorPredicate.test(60);
+boolean isEligibleToWork = isMajorPredicate.and(isSeniorCitizenPredicate);
 ```

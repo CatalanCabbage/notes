@@ -248,7 +248,7 @@ stream = Stream.iterate(1, i -> i * 2).limit(10); //Limit needs to be used
 
 //Generate a finite sequential ordered stream
 //Equivalent to a for loop: for (int i = 1; i < 10; i++)
-stream = Stream.iterate(0, i -> i < 10, i -> i + 1);
+stream = Stream.iterate(0, i -> i < 10, i -> i + 1); //This is Java 9 though!
 ```
 
 ### Stream operations
@@ -256,6 +256,48 @@ Types of operations:
 - **Intermediate:** Do not produce results, but manipulate and return a stream, like `filter()`  
 - **Terminal:** Produce a result, like `collect()`
 
+> When working with primitives, use primitive stream flavours, such as `IntStream` for `int`.  
+
+#### Filter  
+`Stream filter(Predicate<? super T> predicate)`  
+Filters current stream and returns a new Stream.  
+```java
+//stream has a sequence of ages
+stream.filter(age -> age > 18)
+    .forEach(System.out::println);
+
+//can be chained
+stream.filter(age -> age > 10)
+    .filter(age -> age < 18)
+    .forEach(System.out::println);
+```
+
+#### Map
+`Stream map(Function<? super T, ? extends R> mapper)`  
+Transforms elements and returns a new stream. Takes an input lambda function and applies it on each element.  
+**FlatMap**: Used to flatten a stream of Collections into a stream of elements from those collections since many intermediate Stream operations don't work on Streams of Collections.  
+Eg: `Stream<String[]>` or `Stream<List<String>>` to `Stream<String>`  
+
+```java
+stream.map(age -> (age + 100))
+
+//Get a primitive-typed stream
+stream.mapToInt(age -> (age + 100)) //Returns an intStream
+
+//flatMap
+List<List<String>> list = new ArrayList<>();
+list.add(Arrays.asList("a","b","c"));
+list.add(Arrays.asList("d","e","f"));
+stream = list.stream();
+//Won't work
+stream.filter(x -> x.equals("f")); 
+//Works
+stream.flatMap(l -> l.stream())
+    .filter(x -> x.equals("f"));
+
+stream.flatMapToInt(l -> l.stream())
+    .filter(x -> x.equals("9"));
+```   
 
 
 ## Interfaces part 2

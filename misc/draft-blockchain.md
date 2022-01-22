@@ -17,7 +17,9 @@ Characteristics of blockchain:
 - **Immutable:** Every change is permanent
 - **Integrity by consensus:** Does not require all nodes to be trusted nodes like traditional networks  
 
-Consensus protocols:  
+Eg: Ethereum, Tezos, Cardano, Eos.io
+
+## Consensus protocols:  
 Proof of Work (PoW)
 Proof of Stake (PoS) 
 Delegated Proof of Stake (DPoS)
@@ -38,9 +40,34 @@ However:
 - Price would ramp up to prevent a hostile takeover
 - Attacking the network would decrease the coins’ value that the attacker is holding
 
-# Cryptocurrency
+## Cryptocurrency
 Most popular implementations of Blockchain.  
-Mining:
+Mining: _TODO_
+
+## Smart contracts
+They are programs stored on a blockchain that run when predetermined conditions are met; it is visible to all users of the blockchain.  
+A smart contract fortifies agreements in code so the rules are automatically enforced without courts (or any third party) getting involved.  
+
+Once code is pushed into production, it can no longer be changed by any other means other than a consensus reached through member voting.  
+However, this leads to a situation where visible bugs may not be quickly fixed, because any change, even a fix, needs consensus.  
+Smart contracts are not legally binding, unlike smart _legal_ contracts. 
+
+**Eg Languages**: Solidity, Simplicity, Scilla, Ivy, Bitcoin Script, Vyper.  
+Ethereum is the most popular blockchain to run smart contracts on; they're typically written in [Solidity](https://en.wikipedia.org/wiki/Solidity). Solidity is a turing-complete language that is compiled into low-level bytecode to be run by the Etherium Virtual Machine.  
+However, the other languages consider being turing-complete to be a security risk and deliberately avoid them.  
+
+## DAO - Decentralized Autonomous Organization
+- A community-led entity with no central authority; no hierarchy.  
+- Fully autonomous and transparent: smart contracts lay the foundational rules, execute the agreed upon decisions, and at any point, proposals, voting, and even the very code itself can be publicly audited.  
+- To obtain voting power or membership in a DAO, governance tokens (typically cryptocurrencies) are needed.  
+- **Alignment of incentives**: It is in the best interest of members to approve proposals that serve the best interests of the protocols itself.  
+
+## NFT - Non-fungible tokens
+Non-interchangeable unit of data stored on a blockchain.  
+- Differ from cryptocurrencies, since NFTs are uniquely identifiable.  
+- Claim to provide a public proof of ownership.
+- Do not restrict the sharing or copying of underlying digital files.
+- Do not prevent the creation of NFTs with identical associated files.
 
 
 

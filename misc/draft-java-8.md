@@ -299,6 +299,76 @@ stream.flatMapToInt(l -> l.stream())
     .filter(x -> x.equals("9"));
 ```   
 
+## Method references
+Shortened versions of lambda expressions that call a specific method.  
+`s -> System.out.println(s);` can be written as `System.out::println`.  
+
+Types of method references:  
+```java
+public class Account {
+    int amount;
+    int tax;
+    Account(int amount) {
+        this.amount = amount;
+        this.tax = amount / 10;
+    }
+    public int getTax() {
+        return tax;
+    }
+
+    @Override
+    public String toString() {
+        return "Tax is " + tax;
+    }
+}
+
+public class Test {
+    public static int getLengthStatic(String str){
+        return str.length();
+    }
+
+    public int getLength(String str){
+        return str.length();
+    }
+
+    public static void main(String[] args) {
+        List<String> list = new Arrays.asList("str1", "str2", "str3");
+
+        //1. Referencing a static method
+        list.stream()
+            //.mapToInt(str -> Test.getLengthStatic(str))   //Normal lambda
+            .mapToInt(Test::getLengthStatic)                //Alternative
+            .forEach(System.out::println);
+        
+        //2. Using instances for non-static methods
+        Test test = new Test();
+        list.stream()
+            //.mapToInt(str -> test.getLength(str))     //Normal lambda
+            .mapToInt(test::getLength)                  //Alternative
+            .forEach(System.out::println);
+
+        List<Account> accounts = new ArrayList<>();
+        accounts.add(new Account(50000));
+        accounts.add(new Account(1000));
+
+        //3. Instance of an arbitrary object        
+        int totalTax = list.stream()
+                //.mapToInt(account -> account.getTax())    //Normal lambda
+                .mapToInt(Account::getTax)                  //Alternative
+                .sum();
+
+        List<Integer> amounts = new Arrays.asList(1000, 50000);
+        //4. Constructor references
+        list.stream()
+            //.map(amount -> new Account(amount))
+            .map(Account::new)
+            .forEach(System.out::println);
+
+    }
+}
+
+
+```
 
 ## Interfaces part 2
 ### Predicate functional interface

@@ -69,7 +69,7 @@ Non-interchangeable unit of data stored on a blockchain.
 - Do not restrict the sharing or copying of underlying digital files.
 - Do not prevent the creation of NFTs with identical associated files.
 
-
+## Environmental effects
 
 # References:  
 [101 Blockchains](https://101blockchains.com/blockchain-explained/) - Very basic  

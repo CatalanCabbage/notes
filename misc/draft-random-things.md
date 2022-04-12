@@ -21,6 +21,7 @@ Steps to compute:
 https://en.wikipedia.org/wiki/Luhn_algorithm
 https://en.wikipedia.org/wiki/Check_digit
 
+-----
 ## QR Code
 Quick Response Code - 2D barcode.  
 Consists of black squares arranged in a square grid on a white background, processed using Reed–Solomon error correction until the image can be appropriately interpreted.
@@ -57,7 +58,7 @@ Version 40 contains 177 rows and columns, which can store 3kb of data (`177 * 17
 https://www.qr-code-generator.com/qr-code-marketing/qr-codes-basics
 https://qrcode.meetheed.com/question7.php
 
-
+-----
 # Todoo
 - Turing complete  
 - Halting problem  
@@ -67,3 +68,5 @@ https://qrcode.meetheed.com/question7.php
 - RAFT  
 - Distributed hashing  
 - Click-to-run
+- Huffman tree
+- Cron jobs

@@ -12,16 +12,15 @@ In true skiddie fashion, I put those two scripts together instead of fixing Gram
 
 # Steps
 ```bash
-# Install python3
+# 1. Install python3
+# 2. Save the script as "get_cookies.py"
 
-# Save the script as "get_cookies.py"
-
-# Install dependencies needed for this script
+# 3. Install dependencies needed for this script
 # "python.exe" might be "py" or "python3" depending on the environment
 python.exe -m pip install pywin32
 python.exe -m pip install pycryptodomex
 
-# Run the script
+# 4. Run the script
 # To display cookies
 python.exe .\get_cookies.py
 # To save cookies as a file in the same folder

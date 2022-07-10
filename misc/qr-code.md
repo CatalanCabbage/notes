@@ -31,5 +31,5 @@ Version 40 contains 177 rows and columns, which can store 3kb of data (`177 * 17
 - iQR code: Stores data more efficiently, supports rectangular modules, can be used on non-flat surfaces
 - Frame QR code: Central area of the QR code is left blank for branding. Not backward compatible 
 ## References
-https://www.qr-code-generator.com/qr-code-marketing/qr-codes-basics
+https://www.qr-code-generator.com/qr-code-marketing/qr-codes-basics  
 https://qrcode.meetheed.com/question7.php

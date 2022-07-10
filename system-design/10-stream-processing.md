@@ -91,9 +91,22 @@ A computation system that reliably processes unbounded streams of data, doing fo
 Was open sourced after being acquired by Twitter.  
 
 #### Apache Kafka
-Preferred for real-time streaming.  
+Preferred for real-time event streaming, **optimized for high throughput**.  
 An open-source distributed stream processing & messaging platform developed by LinkedIn.  
 Used in the industry to develop real-time features such as notification platforms, managing streams of massive amounts of data, monitoring website activity & metrics, messaging, log aggregation.  
+
+##### Some design decisions that make Kafka fast
+References: [Article](https://medium.com/@sunny_81705/what-makes-apache-kafka-so-fast-71b477dcbf0), [ByteByteGo video](https://www.youtube.com/watch?v=UNUz1-msbOM)  
+- Reliance on sequential I/O: Disk access speeds depend on data access patterns. Random access is slow (100x KB/s), sequential access is fast (100x MB/s).  
+To take advantage of this, it uses an append-only log as the primary data store.
+- Zero-copy - Eliminates excess `copy`s: Kafka moves a lot of data from disk to network and vice versa. To make it fast, it uses [zero-copy operations](https://developer.ibm.com/articles/j-zerocopy/) to keep the data within the kernel space instead of involving the application (user/Kafka) space.   
+Movement without zero-copy:  
+Disk -> OS Buffer (RAM) -> (Copy) Kafka Application Buffer -> (Copy) Socket Buffer -> (Copy) NIC Buffer -> Sent.  
+Movement with zero-copy:  
+Disk -> OS Buffer (RAM) -> (Copy) Socket Buffer -> (Copy) NIC Buffer -> Sent.  
+
+
+
 
 ### Popular Architectures
 - Lambda architecture

@@ -3,6 +3,10 @@
 # Download a file
 wget <url> 
 
+# List files
+ls -1 #List files, 1 per line
+ls -1 | wc -1 #List files and count lines (wc = word count)
+
 # View contents
 cat <file_path> #Shows complete contents
 nl <file_path> #Shows contents with line numbers

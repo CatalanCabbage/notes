@@ -11,7 +11,7 @@
 - Databases dedicated to mobile apps
 
 ### Document-Oriented database  
-They store data in a document-oriented model in independent documents.    
+They store data in a document-oriented model in independent documents. Best for self-contained documents.    
 The data is generally semi-structured and stored in a JSON-like format.  
 Flexible schema - can be changed over time.  
 Stores all information for a given object in a single instance in the database, and every stored object can be different from every other.  
@@ -40,6 +40,7 @@ Used by [SEGA](https://www.mongodb.com/blog/post/sega-hardlight-migrates-to-mong
 They store data in nodes/vertices and edges in the form of relationships.  
 Each Node in a graph database represents an entity (a person, place, business etc).  
 The Edge represents the relationship between the entities.  
+Useful when there are relationships across all data.
 
 Eg. Neo4J
 
@@ -49,6 +50,10 @@ Why pick Graph DBs over Relational DBs?
   Here, relationships are are persisted in the DB and stored as edges, and only retrieval happens.
   
 Used by [NASA](https://neo4j.com/blog/david-meza-chief-knowledge-architect-nasa/) and [Walmart](https://neo4j.com/blog/walmart-neo4j-competitive-advantage/) to gain insights from relationships.
+
+#### Can we use SQL databases for graphs?
+Yes, but it gets complex. In a relational DB, we know in advance exactly what tables to join to get the data we want.  
+In graph queries, we need to traverse a variable number of edges before we get the data we want - ie., joins aren't fixed. We can simulate this using recursive common table expressions though.  
 
 ### Key-value database
 They use a simple key-value mapping method to store and quickly fetch data with minimum latency.  
@@ -122,12 +127,16 @@ But if wide-column database is used, they can store their corresponding key-valu
 A columnar (column-oriented) database stores data tables by column rather than by row.  
 - Low IO requirements: When all values in a column are needed: reduces the overall disk I/O requirements and reduces the amount of data you need to load from disk, since they're stored close together.  
 - Easy compression: Since column values are stored together, their data-type is the same and they can be compressed easily.  
-
-Use-case: Typically for analytical operations.
+- Vectorized processing is possible: running queries directly on compressed data. 
+ 
+Use-case: Typically for analytical operations in data warehouses.  
+Used a a part of ETL: Data is **extracted** for OLAP purposes from OLTP DBs, **transformed** into an analysis-friendly schema and then **loaded** in the data warehouse.
 
 Eg. Say a row has 100 columns. You run a query involving 5 columns.  
 In RDBs, all rows are fetched and then columns are filtered - 100% data is read.  
 In wide-column DB, only those 5 columns are read; and since they're close to each other wrt storage blocks, no filtering is needed; only 5% of data is read.   
+
+**Data cubes** are also used to assist in analytical queries. Data cubes are matrices that store aggregate dimensions of data like sum, etc. Values are directly taken from this instead of computing them again. Overhead: They need to be updated when new data is retrieved.   
 
 Eg. PostgreSQL c-store, InfiniDB, Amazon Redshift, Microsoft Azure SQL Data Warehouse, Google BigQuery
 

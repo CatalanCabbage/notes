@@ -1,3 +1,123 @@
+# Models
+### The Hierarchial model
+In the 70's, the most popular DB was IBM's Information Management System.  
+It represented data like trees. When dealing with many-to-many relationships, the user had to decide whether to:  
+- Duplicate data, avoiding joins but risking inconsistency
+- Manually resolve references, making joins easier but more consistent
+
+### The Network model
+This was the evolution of the hierarchial model, where every record could have multiple parents. This made many-to-many relationships possible.  
+To navigate data, users had to manually follow the path from a root record along links, called the **access path**.  
+This worked well and made good use of limited hardware capabilities of the 70's - tape drive seeks were extremely slow and access paths could be manually optimized.  
+However, it fell short when the data model needed changes - new access paths had to be derived, and updating data was difficult.
+
+## The Relational model
+The relational model lay all data out in the open - there are no complicated nested data structures.  
+Data is formed by rows, we could read whatever we wanted.  
+The access path is still needed in this case to make joins when many-to-many data is involved.  
+However, **the query optimizer automatically derives access path** - the order of operations, indices to be used etc.  
+
+Query optimizers for relational databases are complicated. However, the main insight here was this:  
+**You need to build a query optimizer once, and all applications that use the DB can benefit from it.** It's easier to hand-code the best access path for specific queries, but the general-purpose solution wins in the long run.  
+
+
+# Storage engines for Indexes
+In order to find a value in a DB efficiently, we can use indexes. Well chosen indexes speed up read queries, but every index slows down writes.  
+
+## What's stored in indexes?
+Along with the key, we can either store the actual value of the key (clustered) or a pointer to the value on the heap file (non-clustered).  
+In some situations, we might want to store the row value along with the key for performance. This is called a **clustered index**.  
+In MYSQL's InnoDB, the primary key is always a clustered index. However, the secondary indexes refer to the primary key rather than the heap file location.  
+It gets complicated if on updates the value is larger than the initial value; the key will have to be moved to a new location. All indexes need to be updated to point to the new location, or a forwarding pointer is left behind.
+
+As a compromise between a clustered index and a non-clustered index, we can store _some_ data with the key. This allows some queries to be answered with the index alone. This is called a **covering index**.
+
+
+## Hash indices 
+Hash indexes can be used, where the key is the hash of the key and value is the "byte offset" or location where the value is stored. This is similar to a hashmap; Bitcask, the storage engine used in [Riak](https://riak.com/) (an enterprise noSQL DB) does this as long as all keys fit in the available RAM.  
+This is well suited when the value of each key is updated frequently - such as like/dislike counts, view counts, etc.
+
+However,  
+- The hash indices must fit in memory. We can store them on the disk and retrieve them, but there's latency.  
+- Range queries are inefficient on hash indices. Each key needs to be checked individually.
+
+## Log-structured storage engines
+We can use an append-only file to store data. Each new entry is a new entry that's appended to the file. Updates and deletes are also appended to the data file.  
+When a delete is made, the new entry indicates this; this entry is called a "tombstone" marker.  
+
+### How do we make sure we don't run out of space?
+We can break the log into "segments" by closing log files (segment files) once it reaches a certain size.  
+**Compaction**: Once that's broken down, we can process the file and discard all duplicates, keeping only the latest entry for each key.  
+**Merging**: During compaction, segment files become smaller. Thus, multiple segment files can be merged into a single larger file during the compaction process.  
+
+**Merging and compaction strategies:**  
+**Size-tiered compaction**: When a group of SSTables become the same size (generally 4), they're merged into a new larger table.  
+**Leveled compaction**: The key range is split into separate "levels", where compaction happens incrementally - the SSTables are just merged into a certain size and moved to the next level while maintaining sorted order among other SSTables in that level.  
+
+Apart from this, there are other compaction strategies - Time based, ICS (Incremental), etc.  
+[Scylla docs - Strategies](https://docs.scylladb.com/stable/architecture/compaction/compaction-strategies.html)  
+[Scylla docs - Comparison](https://docs.scylladb.com/stable/architecture/compaction/compaction-strategies.html#id1)  
+
+### SS Tables - Sorted String tables
+Quick retrieval: If there are a low number of keys, each segment can have in-memory hash indices that store keys and offsets for quick retrieval. The snapshot of this hash index can be stored along with the segment files for crash recovery.  
+
+**What if there are more keys than can be held in-memory?**  
+We make a change to the segment files we use: we require that all keys in a segment file be sorted. These segment files are called **SS Tables**.  
+If this is done, retrieval is much quicker when number of keys is large - instead of storing all keys in the hashmap, we store only the the first key of each segment in our hash index. Once we find the file that contains the key, we can search that file. If all keys are of the same size, we can even use binary search.  
+
+This sorting can be done during the merging and compaction process, like mergesort.  
+The storage engine can also hold the keys in sorted order as the writes come in: we can hold a balanced tree sorted data structure (memtable).  
+
+### Handling crashes
+When the storage engine crashes, the in-memory memtable is lost; the most recent writes are lost.  
+To handle this, we can maintain another append-only log that's deleted whenever memtable is written to disk.  
+
+### Summary
+- Writes come in and they're stored in a memtable (sorted data structure)
+- When memtable becomes bigger than some threshold, write it to disk as an SSTable. Writes continue in another memtable instance.  
+- To serve reads, look for keys from the newest SSTable.
+- Merging and compaction runs as a background job  
+
+### Optimizations
+This is slowest when trying to read a key that doesn't exist in the DB - we check all SSTables in the DB.  
+In that case, we can use a bloom filter to check for non-existent keys before checking our DB.  
+
+### Why append-only?
+- Appending and segment merging are sequential write operations, which are generally much faster than random writes (LinkedList vs ArrayList!).  
+- Concurrency and crash recovery are much simpler since segment files are append-only and immutable. We don't have to worry about cases where an older file is being updated and a crash happens, leaving the file in an inconsistent state.  
+- The disadvantage of this causing duplication is offset by merging and compaction.
+
+
+## B-Tree based storage engines
+Instead of breaking the DB down into variable-sized segments like Log-structured indexes, B-Trees break the DB down into fixed-size **blocks** or **pages** (usually 4kb) and read or write them one page at a time. Each page can be identified using an address - like a pointer, but on the disk instead of in-memory.    
+Retrieval is `log(n)` since this is balanced.  
+This corresponds more closely to the underlying hardware since disks are also segmented into blocks.  
+
+One page is designated the "root" of the B-tree; all lookups for reads or updates happen from here. Each page can contain multiple child references; the child pages are responsible for their respective key-ranges.  
+**Branching factor**: The number of child page references in one page of the B-tree.  
+
+If a value needs to be added, we find the page that encompasses the range of the key we want to insert and add it there. If there isn't enough space, we split it into two pages and the parent is updated with 2 child references - for the old and new pages.  
+
+### Handling crashes
+Some operations such as addition of a new key when the page is full might span multiple pages - 2 of the split pages and the parent page.  
+This is a dangerous operation in terms of crashing and can corrupt pages leading to orphan pages.  
+To protect against this, an append-only log, **Write-ahead log** (WAL) is maintained where the most recent B-tree modifications are written to before performing operations on the B-tree.
+
+### Optimizations
+- Instead of maintaining the WAL and writing pages directly, some DBs like LMDB use a copy-on-write mechanism - new pages are written in another place, after which the parent page is overwritten with the new pointers.  
+- Abbreviate keys to increase the branching factor. We just need to know the boundaries.
+- Try to lay out leaves in sequential order in the disk, but hard when new pages are added.
+- Additional pointers may be added to pages to point to sibling pages instead of having to go to the parent.
+
+### B-Trees vs LSM trees
+- B-trees have a higher overhead: Complete pages must be overwritten even if only a few bytes have changed.
+- B-trees can have higher storage overheads since there might be many fragmented (partially filled) pages. LSM Trees however consolidate all data during compaction and don't leave unused space.
+- The compaction process in LSM-trees can interfere with live read/write operations. If the compaction process isn't able to keep up with incoming reads/writes, it can lead to disk space running out. Reads also start to take longer since they'll have to check more segment files.
+- A key exists exactly in one place in B-trees; we can use this property to build transactional guarantees. We can place locks directly on the tree if we want to. This is not possible in LSM trees.
+
+
+
+
 # Databases
 A component used to persist data.
 
@@ -7,6 +127,16 @@ Classification of data:
 - **Semi-structured data**: Mix of structured and unstructured data. Usually stored in XML, JSON, etc.
 
 > Throughput: Actions (like Transactions) per second
+
+## Why not keep everything in-memory?
+- RAM costs more than disks
+- Disks are much more durable
+
+As long as the data fits in-memory, we can use the disk to store the WAL to be loaded after crashes. This provides durability.  
+In-memory databases can be extended to work with data larger than the memory by writing to disk but caching the most recently used disk block, evicting the least recently used block. This is similar to what OSs do withh virtual memory, but a DB can manage memory at a more granular level since it deals with individual pages and keys.
+### Why are disks slower than in-memory?
+Counterintuitively, the performance advantage of in-memory databases is not that they don't need to read from disk. Even in a disk-based DB, we might never need to read from disk - the OS caches recently loaded disk blocks in memory anyway.  
+They're faster since they can avoid the overheads of encoding in-memory data to a format that can be written to the disk.
 
 ## Relational (SQL) Databases
 Modelled based on the normalized relationship between data. ACID compliant.  
@@ -31,13 +161,18 @@ This helps uphold Data Consistency.
 
 
 ## NoSQL Databases
-No...SQL. More like JSON-based databases.  
+No...SQL. Document-based (like JSON) databases.  
 Built for high frequency reads and writes.  
 Eventually consistent.  
-Eg. MongoDB, Redis, Cassandra, Neo4J, Google Cloud datastore
+Eg. MongoDB, Redis, Cassandra, Neo4J, Google Cloud datastore  
+
+In noSQL databases, joins aren't needed for one-to-many relationships since data can be stored as nested trees.  
+However, since support for joins is often weak, it gets complex for many-to-many relationships.  
+When the DB doesn't support joins natively, the responsibility is shifted to application code.  
 
 **Advantages:**
-- Fast reads/writes
+- Fast reads/writes - locality effect when you need to read large parts of the document at the same time.
+- Sometimes closer to the data structures used by the application  
 - Can scale easily - can add new server nodes on the fly
 - Designed to run intelligently on clusters
 - No schema, flexible
@@ -57,6 +192,13 @@ Performance: Depends on design; SQL with a lot of joins will inevitably take mor
 SQL with no relationships and joins == NoSQL.  
 
 [Why Quora uses SQL and not NoSQL](https://www.quora.com/Why-does-Quora-use-MySQL-as-the-data-store-instead-of-NoSQLs-such-as-Cassandra-MongoDB-or-CouchDB-Are-they-doing-any-JOINs-over-MySQL-Are-there-plans-to-switch-to-another-DB)
+
+NoSQL is not schemaless; it has a schema, or we wouldn't know how to process data.  
+**SQL can be considered schema-on-write**, where schema is validated on writing data. If we need to change schema, we need to perform a migration before writing data.  
+This is similar to statically typed languages.    
+**NoSQL is schema-on-read**, where schema is validated on reading data. Any data that doesn't conform to the expected schema is handled separately (mostly ignored).  
+This is similar to dynamically typed languages.  
+
 
 ---
 ## ACID Transactions:  

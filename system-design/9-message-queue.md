@@ -4,7 +4,8 @@ Generally FIFO; but priority queues handle it differently.
 
 Features:
 - Facilitate asynchronous behaviour: Modules can communicate in the background without blocking primary tasks.
-- Facilitate cross-module communication: Allows communication in a heterogeneous environment, and also provide temporary storage until messages are processed.
+- Facilitate cross-module communication: Allows communication in a heterogeneous environment, and also provide temporary storage until messages are processed.  
+- Sender doesn't need to know location details of clients
 
 Eg. RabbitMQ, Apache ActiveMQ, Apache Kafka, Azure Event Hubs, AWS SNSS
 

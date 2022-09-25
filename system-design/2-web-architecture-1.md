@@ -21,6 +21,7 @@ Some kinds:
 - Virtual server
 
 ## Client-Server communication
+### REST/SOAP APIs
 Happens over the [HTTP protocol](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview), via REST API.
 REST API is:
 - Stateless (every request is like a new request - needs to have auth info, etc)
@@ -29,6 +30,19 @@ REST API is:
 Before REST, client-server were tightly coupled; eg. JSPs.
 - Business logic was in JSP tags
 - Different code needed for different clients
+
+### Remote Procedural Calls (RPC)
+This model tries to simulate the calling of a local function from the same process even when request is initiated from outside the process.  
+This is called **Location Abstraction**.  
+
+However, a remote service is fundamentally different from a local process. This dissonance leads to some flaws:  
+- Network failures need to be anticipated. A local function call is predictable and either succeeds or fails; however, a network call may fail due to parameters outside our control.
+- A network call might never return and be lost due to timeouts - we have no way of knowing if a request got through or not
+- Idempotence needs to be built into functions. Networks might retry the same action multiple times - say the request goes through and the function is executed, but the response is lost.
+- Local references can be passed efficiently in local functions. In RPC, all params need to be passed through as a sequence of bytes. It can get complicated with complex objects.
+- Low interoperability - the client and server might be written in different languages. One language might not even support the datatype present in another language.
+
+
 
 ---
 

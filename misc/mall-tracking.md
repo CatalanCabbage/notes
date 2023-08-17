@@ -78,27 +78,32 @@ Data needed:
 - Attributes - key value pairs (`shirt: blue, shoes: yes`)
 
 **What is the scale of this data?**    
-Basic assumption for a single entry[^size-refs]:  
-Let's say there are 10 attributes, each of those 16 bytes = 160 bytes.  
-Size per entry: `UUID` (16 bytes) + `GeoJSON` (16 bytes) + `timestamp` (8 bytes) + `attributes` (160 bytes) = `200` bytes.  
-
+Basic assumptions[^size-refs]:  
+Let's say there are on average 10 attributes, each of those 16 bytes = 160 bytes.  
 Each person is tracked every 30 seconds and there are 10,000 people per hour.  
-Number of entries per person per day: `2 per minute * 60 minutes * 24 hours` = `2880 entries/day`.  
-Size per day: `200 bytes * 2880 entries/person * 24,000 people/day` = `13,824,000,000 bytes` = `13.8GB`.
-Size per month: `13.8GB * 30 days` = `414GB`  
 
-Optimization - the timestamp and location changes every 30s but attributes remain the same for a user. We can discard the `160 bytes` that we added in each entry.  
-Size per location entry: `UUID` (16 bytes) + `GeoJSON` (16 bytes) + `timestamp` (8 bytes) = `40` bytes.  
-Size per attributes entry: `UUID` (16 bytes) + `attributes` (160 bytes) = `176` bytes.  
-Size for location entry per day: `40 bytes * 2880 entries/person * 24,000 people/day` = = `2,764,800,000 bytes` = `2.7GB`.  
-Size for attributes entry per day: `176 bytes * 24,000 people/day` = `4,224,000 bytes` = `4.2MB`.  
-**Total size per month: `2.7GB * 30 days` + `4.2MB * 30 days` = `81GB`**
+| Data | Calculation | Total |
+| ---- | ----------- | ----- |
+|Size per entry|`UUID` (16 bytes) + `GeoJSON` (16 bytes) + `timestamp` (8 bytes) + `attributes` (160 bytes)|`200` bytes|
+|Num of entries per person per day|`2 per minute * 60 minutes * 24 hours`|`2880 entries/day`|
+|Size per day|`200 bytes * 2880 entries/person * 24,000 people/day` = `13,824,000,000 bytes`|`13.8GB`|
+|Size per month|`13.8GB * 30 days`|`414GB`|
 
+Optimization - the timestamp and location changes every 30s but attributes remain the same for a user. We can store this data separately and then map by UUID.  
 
+| Data | Calculation | Total |
+| ---- | ----------- | ----- |
+|Size per location entry| `UUID` (16 bytes) + `GeoJSON` (16 bytes) + `timestamp` (8 bytes)|`40` bytes|
+|Size per attributes entry|`UUID` (16 bytes) + `attributes` (160 bytes)|`176` bytes|
+|Size for location entry per day|`40 bytes * 2880 entries/person * 24,000 people/day` = `2,764,800,000 bytes`|`2.7GB`|
+|Size for attributes entry per day|`176 bytes * 24,000 people/day` = `4,224,000 bytes`|`4.2MB`|
+|Total size per month|`2.7GB * 30 days` + `4.2MB * 30 days`|`81GB`|
 
+In conclusion, **total size per month = `81GB`**
 
+#### The data store
+SQL or noSQL?  
 
-**When is data purged?**  
 
 
 ### Resolving queries with data from the data store

@@ -7,7 +7,16 @@ We have a mall with a mesh of CCTVs. We want to track the path people take throu
 - Data processing does not happen in real time
 - Queries for the data of the last 30 days are allowed
 
+## What kind of queries do we get?  
+Some sample queries we might get: <sup>_#1_</sup>  
+- Path of people wearing blue shirts
+- Path of people wearing shoes
+- Average distance covered by people
+
 # Design
 CCTVs have video data. Video is somehow converted into raw data that we can process.  
 This raw data is then transformed into something we can query.  
 When we get a query, we try to use the transformed data. If the transformed data does not have the datapoints we need, we trigger the video -> raw data -> transformed data again.  
+
+# Footnotes
+_<sup>#1</sup> Depends on business requirements (the answer to "why do we need this data?"). Will make some assumptions for now._

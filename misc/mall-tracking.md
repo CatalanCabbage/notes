@@ -50,21 +50,31 @@ An on-prem server is needed to reliably take data from the CCTVs and upload it t
 - An on-prem server is present in the mall to reliably upload video data to our data store.  
 - We have warm storage for 30 days of video data and cold storage for the next 30 days.
 
-_Scope for optimization: We can move some of the basic processing from our processing load to this on-prem server; will reduce the size and load of the system._
+_Scope for optimization: We can move some of the basic processing from our processing load to this on-prem server; will reduce the size of data sent and load of the system._
 
 ### Processing videos to get raw data
-- What does the raw data look like?
-- What is the scale of this data?
-- How expensive might processing be in terms of time?
-- When is data purged?
+In this context, raw data is the output from the ML model. Maybe we need to do some extra processing to make it usable, split it into floor sections etc later.  
+
+1. **What is the scale of this data, how expensive is the processing?**  
+Scale is 28tb/day; processing depends on the application, but from a structural pov looks like it would take a few servers - the equivalent of EC2 instances.[^ec2-for-ml]
+
+**2. What does the raw data look like?**
+A unique identifier, a list of co-ordinates, attributes, timestamps in any format.  
+
+**3. When is data purged?**  
+A cron job/scheduler can be set up to move data from warm storage to cold storage everyday.
+
+### Conclusion:
+We have a few servers that process video data and convert it into raw data, and a cron job that runs to move data to cold storage past the 30 day mark.
 
 ### Transforming and loading raw data to a data store
-- What does the data in the data store look like?
-- What is the scale of this data?
-- When is data purged?
+**What does the data in the data store look like?**
 
-### Getting queries from the user
-- How is it queried, what format?
+
+**What is the scale of this data?**    
+
+**When is data purged?**  
+
 
 ### Resolving queries with data from the data store
 - What happens when data not present in the data store is requested?
@@ -75,3 +85,4 @@ _Scope for optimization: We can move some of the basic processing from our proce
 # Footnotes
 [^queries]: _Depends on business requirements (the answer to "why do we need this data?"). Will make some assumptions for now._  
 [^worst-case]: _Assuming all CCTVs are recording 24 hours a day. Practically we might have off hours where analytics isn't needed._
+[^ec2-for-ml]: _[Amazon's ML infrastructure recommmendation](https://aws.amazon.com/machine-learning/infrastructure-innovation), a bunch of EC2 instances._

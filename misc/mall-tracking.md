@@ -8,7 +8,7 @@ We have a mall with a mesh of CCTVs. We want to track the path people take throu
 - Queries for the data of the last 30 days are allowed
 
 ## What kind of queries do we get?  
-Some sample queries we might get: <sup>_#1_</sup>  
+Some sample queries we might get:[^queries]  
 - Path of people wearing blue shirts
 - Path of people wearing shoes
 - Average distance covered by people
@@ -34,29 +34,44 @@ _(todo)_ Incidental features/nice to haves:
 - Metrics (data ingestion, queries processed etc)
 - Scheduled reports
 
-## Fetching and storing data from CCTV
-- Where do we store videos?
-- How do we get data from CCTVs to the data store?  
+### Fetching and storing data from CCTV
+**1. How much video do we have?**  
+Factors: Number of CCTVs (1000), retention period (30 days + 30 days backup), quality (HD, 1080p).  
+Storage needed for 60 days[^worst-case]: `1.2GB (1 hour HD video) * 1000 CCTVs * 24 hours * 60 days` = `1728TB`.
 
-## Processing videos to get raw data
+**2. Where do we store videos?**  
+For data of the first 30 days, store it in warm storage like S3. For data of the next 30 days, store it in cold storage with expected infrequent access like Glacier (S3 costs >4x more than Glacier!).
+
+**3. How do we get data from CCTVs to the data store?**  
+Bandwidth needed per second: `1.2GB (per hour) * 1000 CCTVs / 60` = `20GB/s`.  
+An on-prem server is needed to reliably take data from the CCTVs and upload it to the data store.  
+
+#### Conclusion:
+- An on-prem server is present in the mall to reliably upload video data to our data store.  
+- We have warm storage for 30 days of video data and cold storage for the next 30 days.
+
+_Scope for optimization: We can move some of the basic processing from our processing load to this on-prem server; will reduce the size and load of the system._
+
+### Processing videos to get raw data
 - What does the raw data look like?
 - What is the scale of this data?
 - How expensive might processing be in terms of time?
 - When is data purged?
 
-## Transforming and loading raw data to a data store
+### Transforming and loading raw data to a data store
 - What does the data in the data store look like?
 - What is the scale of this data?
 - When is data purged?
 
-## Getting queries from the user
+### Getting queries from the user
 - How is it queried, what format?
 
-## Resolving queries with data from the data store
+### Resolving queries with data from the data store
 - What happens when data not present in the data store is requested?
 - When is data purged?
 
 
 
 # Footnotes
-_<sup>#1</sup> Depends on business requirements (the answer to "why do we need this data?"). Will make some assumptions for now._
+[^queries]: _Depends on business requirements (the answer to "why do we need this data?"). Will make some assumptions for now._  
+[^worst-case]: _Assuming all CCTVs are recording 24 hours a day. Practically we might have off hours where analytics isn't needed._

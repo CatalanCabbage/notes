@@ -59,19 +59,44 @@ In this context, raw data is the output from the ML model. Maybe we need to do s
 Scale is 28tb/day; processing depends on the application, but from a structural pov looks like it would take a few servers - the equivalent of EC2 instances.[^ec2-for-ml]
 
 **2. What does the raw data look like?**
-A unique identifier, a list of co-ordinates, attributes, timestamps in any format.  
+A unique identifier, a list of co-ordinates, attributes, timestamps - all of this in any format.  
 
 **3. When is data purged?**  
 A cron job/scheduler can be set up to move data from warm storage to cold storage everyday.
 
-### Conclusion:
+#### Conclusion:
 We have a few servers that process video data and convert it into raw data, and a cron job that runs to move data to cold storage past the 30 day mark.
 
 ### Transforming and loading raw data to a data store
 **What does the data in the data store look like?**
-
+Data needed:  
+- Unique identifier, say `UUID`
+- Location identifiers
+    - Like GeoJSON[^geo-json] points: `{"type": "Point", "coordinates": [100.0, 0.0]}`
+    - Or like SRIDs (spatial reference identifiers) - PostGIS[^postgis-points] points: `POINT(100.0, 0.0)`
+- Timestamps with tz
+- Attributes - key value pairs (`shirt: blue, shoes: yes`)
 
 **What is the scale of this data?**    
+Basic assumption for a single entry[^size-refs]:  
+Let's say there are 10 attributes, each of those 16 bytes = 160 bytes.  
+Size per entry: `UUID` (16 bytes) + `GeoJSON` (16 bytes) + `timestamp` (8 bytes) + `attributes` (160 bytes) = `200` bytes.  
+
+Each person is tracked every 30 seconds and there are 10,000 people per hour.  
+Number of entries per person per day: `2 per minute * 60 minutes * 24 hours` = `2880 entries/day`.  
+Size per day: `200 bytes * 2880 entries/person * 24,000 people/day` = `13,824,000,000 bytes` = `13.8GB`.
+Size per month: `13.8GB * 30 days` = `414GB`  
+
+Optimization - the timestamp and location changes every 30s but attributes remain the same for a user. We can discard the `160 bytes` that we added in each entry.  
+Size per location entry: `UUID` (16 bytes) + `GeoJSON` (16 bytes) + `timestamp` (8 bytes) = `40` bytes.  
+Size per attributes entry: `UUID` (16 bytes) + `attributes` (160 bytes) = `176` bytes.  
+Size for location entry per day: `40 bytes * 2880 entries/person * 24,000 people/day` = = `2,764,800,000 bytes` = `2.7GB`.  
+Size for attributes entry per day: `176 bytes * 24,000 people/day` = `4,224,000 bytes` = `4.2MB`.  
+**Total size per month: `2.7GB * 30 days` + `4.2MB * 30 days` = `81GB`**
+
+
+
+
 
 **When is data purged?**  
 
@@ -84,5 +109,8 @@ We have a few servers that process video data and convert it into raw data, and 
 
 # Footnotes
 [^queries]: _Depends on business requirements (the answer to "why do we need this data?"). Will make some assumptions for now._  
-[^worst-case]: _Assuming all CCTVs are recording 24 hours a day. Practically we might have off hours where analytics isn't needed._
-[^ec2-for-ml]: _[Amazon's ML infrastructure recommmendation](https://aws.amazon.com/machine-learning/infrastructure-innovation), a bunch of EC2 instances._
+[^worst-case]: _Assuming all CCTVs are recording 24 hours a day. Practically we might have off hours where analytics isn't needed._  
+[^ec2-for-ml]: _[Amazon's ML infrastructure recommmendation](https://aws.amazon.com/machine-learning/infrastructure-innovation), a bunch of EC2 instances._  
+[^geo-json]: _[GeoJSON wiki](https://en.wikipedia.org/wiki/GeoJSON)_  
+[^postgis-points]: [PostGIS geometries](https://postgis.net/workshops/postgis-intro/geometries.html)  
+[^size-refs]: _Size assumptions are made from [PostgreSQL data types](https://www.postgresql.org/docs/9.1/datatype.html)_

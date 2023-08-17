@@ -6,3 +6,8 @@ We have a mall with a mesh of CCTVs. We want to track the path people take throu
 ## Our assumptions for the system
 - Data processing does not happen in real time
 - Queries for the data of the last 30 days are allowed
+
+# Design
+CCTVs have video data. Video is somehow converted into raw data that we can process.  
+This raw data is then transformed into something we can query.  
+When we get a query, we try to use the transformed data. If the transformed data does not have the datapoints we need, we trigger the video -> raw data -> transformed data again.  

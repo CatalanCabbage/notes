@@ -1,4 +1,59 @@
 _Mall tracking_ 🛒
+# Design overview
+A summary; details and discussions follow.  
+
+_Data flow, CCTV to DataStore:_
+```mermaid
+flowchart TD
+    subgraph Data flow, CCTV to DataStore
+        subgraph Getting data from CCTV to storage
+        direction LR  
+            CCTV3[CCTVs]--> |stream data| OP_SERVER[On-prem server]
+            CCTV3[CCTVs]--> |stream data| OP_SERVER[On-prem server]
+            CCTV3[CCTVs]--> |stream data| OP_SERVER[On-prem server]
+            OP_SERVER[On-prem server]-->|cleaned data| HOT_STORAGE[(Hot<br>storage)]
+        end
+        subgraph Video processing
+        direction TB
+            HOT_STORAGE[(Hot<br>storage)]-.->|fetches data|ML_SERVER[Video extraction server]
+        end
+        subgraph Logic and data-store
+            ML_SERVER[Video extraction server]-->|posts data|APP_SERVER[App server]
+            APP_SERVER[App server]-->|stores data|SQL[(SQL<br>storage)]
+        end
+    end
+```
+
+_Storage details:_  
+```mermaid
+flowchart LR
+    subgraph Video Storage
+    direction LR
+        HOT_STORAGE[(Hot<br>storage)]-.->|data > 30 days|COLD_STORAGE[(Cold<br>storage)]
+    end
+
+    subgraph Data Storage
+    direction LR
+        SQL1[(Primary<br>SQL<br>storage)]-->|actively replicated|SQL2[(Secondary<br>SQL<br>storage)]
+        SQL2[(Secondary<br>SQL<br>storage)]-.->|once a day?|SQL_BACKUP[(Backups)]
+    end
+```
+
+_Query flow:_  
+```mermaid
+flowchart LR
+    subgraph Queries flow
+        CLIENT(Client)-->|request|APP_SERVER[App server]
+        APP_SERVER[App server]-->PRESENT{Present<br>in DB?}
+        PRESENT{Present<br>in DB?}-->|yes, fetch data|SQL[(SQL<br>storage)]
+        PRESENT{Present<br>in DB?}-->|no, add processing request to queue|ML_SERVER[Video extraction server]
+        ML_SERVER[Video extraction server]-.->|notifies on new data extraction|APP_SERVER[App server]
+        APP_SERVER[App server]-->|response|CLIENT
+    end
+```
+
+-----
+
 # Requirements
 ## What are we trying to do?
 We have a mall with a mesh of CCTVs. We want to track the path people take through the mall. We should be able to specify _filters_ for the characteristics of people whose path data we want to get. Eg: People wearing blue shirts.

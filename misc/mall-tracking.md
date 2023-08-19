@@ -24,6 +24,19 @@ flowchart TD
     end
 ```
 
+_Query flow:_  
+```mermaid
+flowchart LR
+    subgraph Queries flow
+        CLIENT(Client)-->|request|APP_SERVER[App server]
+        APP_SERVER[App server]-->PRESENT{Present<br>in DB?}
+        PRESENT{Present<br>in DB?}-->|yes, fetch data|SQL[(SQL<br>storage)]
+        PRESENT{Present<br>in DB?}-->|no, add processing request to queue|ML_SERVER[Video extraction server]
+        ML_SERVER[Video extraction server]-.->|notifies on new data extraction|APP_SERVER[App server]
+        APP_SERVER[App server]-->|response|CLIENT
+    end
+```
+
 _Storage details:_  
 ```mermaid
 flowchart LR
@@ -36,19 +49,6 @@ flowchart LR
     direction LR
         SQL1[(Primary<br>SQL<br>storage)]-->|actively replicated|SQL2[(Secondary<br>SQL<br>storage)]
         SQL2[(Secondary<br>SQL<br>storage)]-.->|once a day?|SQL_BACKUP[(Backups)]
-    end
-```
-
-_Query flow:_  
-```mermaid
-flowchart LR
-    subgraph Queries flow
-        CLIENT(Client)-->|request|APP_SERVER[App server]
-        APP_SERVER[App server]-->PRESENT{Present<br>in DB?}
-        PRESENT{Present<br>in DB?}-->|yes, fetch data|SQL[(SQL<br>storage)]
-        PRESENT{Present<br>in DB?}-->|no, add processing request to queue|ML_SERVER[Video extraction server]
-        ML_SERVER[Video extraction server]-.->|notifies on new data extraction|APP_SERVER[App server]
-        APP_SERVER[App server]-->|response|CLIENT
     end
 ```
 

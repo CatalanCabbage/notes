@@ -50,7 +50,7 @@ An on-prem server is needed to reliably take data from the CCTVs and upload it t
 - An on-prem server is present in the mall to reliably upload video data to our data store.  
 - We have warm storage for 30 days of video data and cold storage for the next 30 days.
 
-_Scope for optimization: We can move some of the basic processing from our processing load to this on-prem server; will reduce the size of data sent and load of the system._
+_Scope for optimization: We can move some of the basic processing from our processing load to this on-prem server; will reduce the size of data sent and load of the system.[^amzn-store]_
 
 ### Processing videos to get raw data
 In this context, raw data is the output from the ML model. Maybe we need to do some extra processing to make it usable, split it into floor sections etc later.  
@@ -99,18 +99,84 @@ Optimization - the timestamp and location changes every 30s but attributes remai
 |Size for attributes entry per day|`176 bytes * 24,000 people/day` = `4,224,000 bytes`|`4.2MB`|
 |Total size per month|`2.7GB * 30 days` + `4.2MB * 30 days`|`81GB`|
 
-In conclusion, **total size per month = `81GB`**
+So total size per month = `81GB`. For the design, let's say **`150GB` per month**.
 
 #### The data store
-SQL or noSQL?  
+**Segregations of data:**  
+1. Person locations (structured)
+2. Person attributes (unstructured)
 
+**Characteristics of our data store:**
+|Characteristic|Suitable DB|
+|---|:---:|    
+|There's unstructured data|NoSQL|
+|Load is within single server limits. Scalability at the cost of consistency is not required.|SQL|
+|Repopulated frequently (whenever parameters change)|NoSQL generally, but only the unstructured part(attributes, `4.2MB/day`) is updated, so SQL|
 
+Overall, SQL seems like a good fit, considering that performance in SQL is comparable to NoSQL[^geo-spatial-benchmark] and the volume of relational data is more than the unstructured data. Avoids table bloat as well. Let's say PostgreSQL.  
+
+**General disadvantages of SQL and mitigations:**  
+- Degradation of performance with large data: Proper indexes and partitioning by month. Our queries are also narrow in scope.
+- Fixed schema: We can use a JSONB or HSTORE column to simulate unstructured NoSQL.
+- Lack of horizontal scalabalility: Our load doesn't warrant this, so this is not a problem.
+
+> **What if this is the wrong choice?** Ideally benchmarks should be done with expected data to find the optimal fit. However, migration is relatively simple considering we need to retain data for a short period and it's a single server - which means we're free to experiment and switch without downtime at any point in the future.
+
+#### The data model
+What we need to store: Locations, attributes. Apart from that, we could also divide floors into sections (can reduce query spans and give us a good enough approximation).  
+
+Core tables:  
+Table `person`: `uuid`  
+Table `person_location`: `uuid`, `location`, `timestamp`  
+Table `person_attributes`: `uuid`, `attributes` (jsonb/hstore[^pg-nosql-sample])  
+
+For optimized queries depending on usage and perf:  
+Eg: for "how many people were exactly next to the door at 5pm?" we'd have to get the coordinates of the door and then query for people in that area.  
+Table `grid`: `grid_id`, `floor`, `location` (bounding polygon of coordinates)  
+Table `person_grid`: `uuid`, `grid_id`, `timestamp` (this is computed by the application. Same as `person_location` but with a different granularity)  
+Utility table for "how many people were in the food court at 5pm?":  
+Table `section`: `section_id`, `section_name`  
+Table `section_grid`: `section_id`, `grid_id`  
+
+**Optimizations:** Beyond this, materialized views are used for any frequently queried data or aggregates. Indexing and tuning is done for any frequently queried columns based on usage[^sample-indexing].  
+
+#### Conclusion:
+An SQL DB with NoSQL support can be used for the DB.  
+Sample workflow: "Path of people wearing blue shirts:"  
+1. Get UUIDs of people with blue shirts from `person_attributes` table (NoSQL query part)  
+1. Get locations of these UUIDs from `person_location` table (SQL query part)
+
+**HA and Load balancing:**  
+We can use active-passive replication for HA and use the passive replica for reads giving us backup and a higher throughput.  
+
+**DR:**  
+Store backups in another infrastructure at intervals that reflects how important the data is. Backups can be taken from the passive replica so as to not interfere with primary reads/writes.    
+
+**Partitioning:**
+Table is partitioned off by month; maintains a consistent size and is easier to purge (performant bulk deletes).  
+- Every month, data older than 30 days is partitioned off to a separate table.
+- Every month, partitions older than 60 days are deleted.
 
 ### Resolving queries with data from the data store
-- What happens when data not present in the data store is requested?
-- When is data purged?
+Workflow: Console to input queries -> Application -> DB  
 
+#### Application
+- Takes care of permissioning and IAM
+- Has a DB of queries for users' use-cases. No raw SQL queries allowed.
+- Maintains audit logs
+- Checks health of DBs, processes metrics to decide if optimizations are needed
+- Maintains a cache of the most frequently used user path data
+- Transforms data into the format needed by users - `csv` for spreadsheets, visualizations like charts or dashboards etc
 
+**All application design should be intentionally data and client agnostic.**  
+ie., `apiHandler -> businessLogic -> dataStore` implies the businessLogic calls the underlying implementation (like S3 APIs).  
+Should be `apiHandler -> presentationLayer -> businessLogic -> dataLayer -> dataStore` where businessLogic uses the Layers as an interface between underlying implementations.  
+Makes it easier to make better tech and business decisions (add new caches where needed, add stubs for tests, switch out DBs etc).  
+
+**What happens when data not present in the data store is requested?**  
+- The video ML analyis is triggered again with the required parameters; all new parameters are reviewed 
+- Triggers a repopulation of the `person_attributes` table, but all location data is untouched
+- A sanity check should be in place to randomly diff older and newer attributes. Can be used to reject new data or trigger a human review.
 
 # Footnotes
 [^queries]: _Depends on business requirements (the answer to "why do we need this data?"). Will make some assumptions for now._  
@@ -118,4 +184,8 @@ SQL or noSQL?
 [^ec2-for-ml]: _[Amazon's ML infrastructure recommmendation](https://aws.amazon.com/machine-learning/infrastructure-innovation), a bunch of EC2 instances._  
 [^geo-json]: _[GeoJSON wiki](https://en.wikipedia.org/wiki/GeoJSON)_  
 [^postgis-points]: [PostGIS geometries](https://postgis.net/workshops/postgis-intro/geometries.html)  
-[^size-refs]: _Size assumptions are made from [PostgreSQL data types](https://www.postgresql.org/docs/9.1/datatype.html)_
+[^size-refs]: _Size assumptions are made from [PostgreSQL data types](https://www.postgresql.org/docs/9.1/datatype.html)_  
+[^amzn-store]: _The [Amazon Store](https://towardsdatascience.com/how-the-amazon-go-store-works-a-deep-dive-3fde9d9939e9) structure does something similar with extra compute on-prem to cut down on bandwidth requirements_
+[^geo-spatial-benchmark]: _[Benchmark paper](https://link.springer.com/article/10.1007/s10707-020-00407-w) for SQL vs NoSQL - performance is comparable_  
+[^pg-nosql-sample]: _Quick overview of the NoSQL datatypes - [hstore, jsonb (binary) and json](https://www.linode.com/blog/databases/harnessing-nosql/)_  
+[^sample-indexing]: _PostgreSQL scales to millions of rows and has table size limits in TBs. We could figure out optimizations [like clustered indices](https://stackoverflow.com/a/35541546) to improve perf later._  

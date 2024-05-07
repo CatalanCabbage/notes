@@ -5,7 +5,7 @@ A summary; details and discussions follow.
 _Data flow, CCTV to DataStore:_
 ```mermaid
 flowchart TD
-    subgraph Data flow, CCTV to DataStore
+    subgraph "Data flow, CCTV to DataStore"
         subgraph Getting data from CCTV to storage
         direction LR  
             CCTV3[CCTVs]--> |stream data| OP_SERVER[On-prem server]
